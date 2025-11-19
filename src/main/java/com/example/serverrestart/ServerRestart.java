@@ -13,8 +13,10 @@ public class ServerRestart extends JavaPlugin {
         
         restartManager = new RestartManager(this);
         
-        // Register command
-        getCommand("resta").setExecutor(new RestartCommand(this, restartManager));
+        // Register command and tab completer
+        RestartCommand restartCommand = new RestartCommand(this, restartManager);
+        getCommand("resta").setExecutor(restartCommand);
+        getCommand("resta").setTabCompleter(restartCommand);
         
         // Start auto-restart scheduler if enabled
         if (getConfig().getBoolean("auto-restart.enabled", false)) {

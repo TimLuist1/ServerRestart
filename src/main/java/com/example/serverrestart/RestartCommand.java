@@ -4,8 +4,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 
-public class RestartCommand implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.List;
+
+public class RestartCommand implements CommandExecutor, TabCompleter {
 
     private final ServerRestart plugin;
     private final RestartManager restartManager;
@@ -17,6 +21,17 @@ public class RestartCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        // Show help when /resta is used with no args
+        if (args.length == 0) {
+            int countdownTime = plugin.getConfig().getInt("countdown-seconds", 10);
+            sender.sendMessage(colorize(plugin.getConfig().getString("messages.help-header")));
+            sender.sendMessage(colorize(plugin.getConfig().getString("messages.help-restart").replace("{time}", String.valueOf(countdownTime))));
+            sender.sendMessage(colorize(plugin.getConfig().getString("messages.help-stop")));
+            sender.sendMessage(colorize(plugin.getConfig().getString("messages.help-help")));
+            sender.sendMessage(colorize(plugin.getConfig().getString("messages.help-footer")));
+            return true;
+        }
+        
         // Handle /resta help
         if (args.length > 0 && args[0].equalsIgnoreCase("help")) {
             int countdownTime = plugin.getConfig().getInt("countdown-seconds", 10);
@@ -61,6 +76,25 @@ public class RestartCommand implements CommandExecutor {
         }
         restartManager.startRestart(reason);
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> completions = new ArrayList<>();
+        
+        if (args.length == 1) {
+            // First argument - suggest subcommands
+            if (sender.hasPermission("serverrestart.use")) {
+                completions.add("stop");
+                completions.add("help");
+            }
+            
+            // Filter by what the player has typed so far
+            String input = args[0].toLowerCase();
+            completions.removeIf(s -> !s.toLowerCase().startsWith(input));
+        }
+        
+        return completions;
     }
 
     private String colorize(String message) {
