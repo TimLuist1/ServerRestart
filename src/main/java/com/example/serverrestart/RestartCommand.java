@@ -36,6 +36,10 @@ public class RestartCommand implements CommandExecutor {
 
         // Handle /resta stop
         if (args.length > 0 && args[0].equalsIgnoreCase("stop")) {
+            if (!sender.hasPermission("serverrestart.stop")) {
+                sender.sendMessage(colorize(plugin.getConfig().getString("messages.no-permission")));
+                return true;
+            }
             if (restartManager.isRestartScheduled()) {
                 restartManager.cancelRestart();
             } else {
@@ -44,14 +48,18 @@ public class RestartCommand implements CommandExecutor {
             return true;
         }
 
-        // Handle /resta
+        // Handle /resta [reason]
         if (restartManager.isRestartScheduled()) {
             sender.sendMessage(colorize(plugin.getConfig().getString("messages.already-in-progress")));
             return true;
         }
 
-        // Start the restart countdown
-        restartManager.startRestart();
+        // Start the restart countdown with optional reason
+        String reason = null;
+        if (args.length > 0) {
+            reason = String.join(" ", args);
+        }
+        restartManager.startRestart(reason);
         return true;
     }
 

@@ -8,7 +8,7 @@ author: YourName
 commands:
   resta:
     description: Restart the server with a countdown or stop a restart
-    usage: /resta, /resta stop, or /resta help
+    usage: /resta [reason], /resta stop, or /resta help
     permission: serverrestart.use
     permission-message: You don't have permission to use this command
 
@@ -16,3 +16,12 @@ permissions:
   serverrestart.use:
     description: Allows use of the restart command
     default: op
+  serverrestart.stop:
+    description: Allows stopping a restart countdown
+    default: op
+  serverrestart.*:
+    description: Grants all ServerRestart permissions
+    default: op
+    children:
+      serverrestart.use: true
+      serverrestart.stop: true
