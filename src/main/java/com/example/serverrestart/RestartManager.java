@@ -49,11 +49,25 @@ public class RestartManager {
                     String restartMsg = plugin.getConfig().getString("messages.restart-now");
                     Bukkit.broadcastMessage(colorize(restartMsg));
                     
-                    // Schedule restart for next tick to ensure message is sent
+                    // Kick all players with custom message
+                    String kickMessage = plugin.getConfig().getString("messages.kick-message", 
+                            "&eServer is restarting\n&7It's back up soon!");
+                    
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            Bukkit.getServer().spigot().restart();
+                            // Kick all online players
+                            Bukkit.getOnlinePlayers().forEach(player -> 
+                                player.kickPlayer(colorize(kickMessage))
+                            );
+                            
+                            // Restart the server after kicking players
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    Bukkit.getServer().spigot().restart();
+                                }
+                            }.runTaskLater(plugin, 10L); // Wait 0.5 seconds after kicking
                         }
                     }.runTaskLater(plugin, 20L); // Wait 1 second (20 ticks)
                     
