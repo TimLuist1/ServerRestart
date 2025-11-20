@@ -21,17 +21,6 @@ public class RestartCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // Show help when /resta is used with no args
-        if (args.length == 0) {
-            int countdownTime = plugin.getConfig().getInt("countdown-seconds", 10);
-            sender.sendMessage(colorize(plugin.getConfig().getString("messages.help-header")));
-            sender.sendMessage(colorize(plugin.getConfig().getString("messages.help-restart").replace("{time}", String.valueOf(countdownTime))));
-            sender.sendMessage(colorize(plugin.getConfig().getString("messages.help-stop")));
-            sender.sendMessage(colorize(plugin.getConfig().getString("messages.help-help")));
-            sender.sendMessage(colorize(plugin.getConfig().getString("messages.help-footer")));
-            return true;
-        }
-        
         // Handle /resta help
         if (args.length > 0 && args[0].equalsIgnoreCase("help")) {
             int countdownTime = plugin.getConfig().getInt("countdown-seconds", 10);
