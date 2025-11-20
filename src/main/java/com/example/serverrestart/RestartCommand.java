@@ -63,19 +63,76 @@ public class RestartCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        // Handle /resta [reason]
+        // Handle /resta [time] [reason] or /resta [reason]
         if (restartManager.isRestartScheduled()) {
             sender.sendMessage(colorize(plugin.getConfig().getString("messages.already-in-progress")));
             return true;
         }
 
-        // Start the restart countdown with optional reason
-        String reason = null;
+        // Check if first argument is a time format (e.g., 30sec, 15min, 2hour)
+        Integer customSeconds = null;
+        int reasonStartIndex = 0;
+        
         if (args.length > 0) {
-            reason = String.join(" ", args);
+            customSeconds = parseTime(args[0]);
+            if (customSeconds != null) {
+                reasonStartIndex = 1; // Reason starts from second argument
+            }
         }
-        restartManager.startRestart(reason);
+        
+        // Get optional reason (everything after time, or everything if no time specified)
+        String reason = null;
+        if (args.length > reasonStartIndex) {
+            String[] reasonArgs = new String[args.length - reasonStartIndex];
+            System.arraycopy(args, reasonStartIndex, reasonArgs, 0, reasonArgs.length);
+            reason = String.join(" ", reasonArgs);
+        }
+        
+        // Start restart with custom time or default
+        if (customSeconds != null) {
+            restartManager.startRestart(customSeconds, reason);
+        } else {
+            // Treat all args as reason if no time format detected
+            if (args.length > 0) {
+                reason = String.join(" ", args);
+            }
+            restartManager.startRestart(reason);
+        }
         return true;
+    }
+    
+    /**
+     * Parse time string like "30sec", "15min", "2hour"
+     * @param timeStr Time string to parse
+     * @return Seconds, or null if invalid format
+     */
+    private Integer parseTime(String timeStr) {
+        if (timeStr == null || timeStr.isEmpty()) {
+            return null;
+        }
+        
+        timeStr = timeStr.toLowerCase();
+        
+        try {
+            // Parse format: [number][unit]
+            if (timeStr.endsWith("sec") || timeStr.endsWith("s")) {
+                String numStr = timeStr.replaceAll("[^0-9]", "");
+                int value = Integer.parseInt(numStr);
+                return value; // Already in seconds
+            } else if (timeStr.endsWith("min") || timeStr.endsWith("m")) {
+                String numStr = timeStr.replaceAll("[^0-9]", "");
+                int value = Integer.parseInt(numStr);
+                return value * 60; // Convert to seconds
+            } else if (timeStr.endsWith("hour") || timeStr.endsWith("h")) {
+                String numStr = timeStr.replaceAll("[^0-9]", "");
+                int value = Integer.parseInt(numStr);
+                return value * 3600; // Convert to seconds
+            }
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        
+        return null;
     }
 
     @Override
@@ -83,8 +140,30 @@ public class RestartCommand implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
         
         if (args.length == 1) {
-            // First argument - suggest subcommands
+            // First argument - suggest time formats and subcommands
             if (sender.hasPermission("serverrestart.use")) {
+                // Time suggestions in seconds
+                completions.add("10sec");
+                completions.add("30sec");
+                completions.add("45sec");
+                completions.add("60sec");
+                
+                // Time suggestions in minutes
+                completions.add("1min");
+                completions.add("5min");
+                completions.add("15min");
+                completions.add("30min");
+                completions.add("45min");
+                completions.add("60min");
+                
+                // Time suggestions in hours
+                completions.add("1hour");
+                completions.add("2hour");
+                completions.add("6hour");
+                completions.add("12hour");
+                completions.add("24hour");
+                
+                // Subcommands
                 completions.add("stop");
                 completions.add("help");
             }

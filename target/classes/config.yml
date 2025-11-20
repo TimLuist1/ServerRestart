@@ -63,9 +63,9 @@ messages:
   
   # Help messages
   help-header: "&6========== ServerRestart Commands =========="
-  help-restart: "&e/resta [reason] &f- Start a {time}-second server restart countdown"
+  help-restart: "&e/resta [time] [reason] &f- Start server restart\n  &7Examples: /resta 30sec, /resta 15min Update, /resta 2hour"
   help-stop: "&e/resta stop &f- Cancel an active restart countdown"
   help-help: "&e/resta help &f- Display this help message"
-  help-footer: "&7Made with love by TimLuist ❤"
+  help-footer: "&7Time formats: [number]sec, [number]min, [number]hour\n&7Made with love by TimLuist ❤"
 
 # Color codes: &a=green, &c=red, &e=yellow, &f=white, &6=gold, &7=gray, &l=bold

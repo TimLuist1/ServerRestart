@@ -26,6 +26,10 @@ public class RestartManager {
     }
 
     public void startRestart(String reason) {
+        startRestart(null, reason);
+    }
+
+    public void startRestart(Integer customSeconds, String reason) {
         if (restartScheduled) {
             return;
         }
@@ -33,8 +37,8 @@ public class RestartManager {
         restartScheduled = true;
         this.restartReason = reason;
         
-        // Get countdown time from config
-        int countdownSeconds = plugin.getConfig().getInt("countdown-seconds", 10);
+        // Get countdown time from config or use custom time
+        int countdownSeconds = (customSeconds != null) ? customSeconds : plugin.getConfig().getInt("countdown-seconds", 10);
         
         // Broadcast initial message
         String announcement = plugin.getConfig().getString("messages.restart-announcement", "&c&lServer is restarting in {time} seconds!")
