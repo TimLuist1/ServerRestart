@@ -1,7 +1,7 @@
 name: ServerRestart
 version: 1.0.0
 main: com.example.serverrestart.ServerRestart
-api-version: '1.13'
+api-version: '26.1'
 description: A plugin for restarting the server with a countdown
 author: TimLuist
 
